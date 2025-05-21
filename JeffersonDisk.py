@@ -33,8 +33,10 @@ class JeffersonCipher:
             disk = self.disks[disk_idx]
             
             if char in disk:
-                # Находим символ в выбранной строке (без сдвига!)
-                cipher_char = disk[key_row % len(disk)]
+                # Находим позицию символа на диске
+                pos = disk.index(char)
+                # Берем символ из key_row (без сдвига!)
+                cipher_char = self.alphabet[pos]
             else:
                 cipher_char = char
             
@@ -43,7 +45,25 @@ class JeffersonCipher:
         return ''.join(ciphertext)
     
     def decrypt(self, ciphertext, key_row):
-        return self.encrypt(ciphertext, key_row)
+        ciphertext = ciphertext.upper()
+        plaintext = []
+        
+        for i, char in enumerate(ciphertext):
+            # Выбираем диск согласно порядку
+            disk_idx = self.disk_order[i % self.num_disks]
+            disk = self.disks[disk_idx]
+            
+            if char in self.alphabet:
+                # Находим позицию символа в стандартном алфавите
+                pos = self.alphabet.index(char)
+                # Берем символ с этой позиции на диске
+                plain_char = disk[pos]
+            else:
+                plain_char = char
+            
+            plaintext.append(plain_char)
+        
+        return ''.join(plaintext)
     
     def display_disks(self):
         print(f"\nJefferson Cipher Disks (Order: {self.disk_order})")
@@ -54,7 +74,7 @@ class JeffersonCipher:
 # Пример использования
 if __name__ == "__main__":
     # Инициализация с 6 дисками (как в оригинальном устройстве)
-    cipher = JeffersonCipher(6)
+    cipher = JeffersonCipher(15)
     
     # Сохраняем ключ (порядок дисков) для последующего использования
     secret_key = cipher.get_key()
